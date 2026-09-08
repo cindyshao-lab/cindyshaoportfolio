@@ -46,16 +46,15 @@ const projects = {
     cover: {
       title: "大模型聚合平台设计",
       role: "负责品牌设计+交互+UI视觉一体化落地",
+      pageClass: "jellytoken-cover-page",
       features: [
         {
           icon: "brand",
-          title: "品牌视觉资产搭建",
-          body: "搭建品牌视觉体系，输出 Logo、官网及全链路 UI，塑造科技人文产品气质。",
+          title: "品牌视觉设计、视觉资产搭建",
         },
         {
           icon: "speed",
-          title: "设计研发交付效能升级",
-          body: "落地 Vibe‑Coding 交付，打通设计研发，降低沟通成本，提速产品迭代。",
+          title: "落地 Vibe‑Coding 交付,设计研发交付效能升级",
         },
       ],
     },
@@ -506,15 +505,34 @@ const projects = {
       ],
       image: "assets/boyu-metaphor-gallery.jpg?v=4",
       imageAlt: "时空碎片・透视放映厅方案界面示意",
+      caption: "图:交互稿",
     },
     implementation: {
       eyebrow: "元境博域 · 藏品图鉴",
       title: "落地成 UI 和动效",
-      body: "透视只是轻度倾斜，保证手机上文字依然好读；粒子动效克制，不会抢藏品本身的风头。胶片框作为卡片容器，既承载藏品图、名字、年代，也承接 hover 时粒子流动的小动画。",
+      body: "3D画册的透视只是轻度倾斜，保证手机上文字依然好读；粒子动效克制，不会抢藏品本身的风头。胶片框作为卡片容器，既承载藏品图、套系名称，也承接了粒子流动的小动画。(下面是我制作的动画的两个版本和UI页面图)",
       image: "assets/boyu-ui-showcase.png?v=2",
       imageAlt: "藏品图鉴 UI 落地界面展示",
-      video: "assets/boyu-activation.mp4",
-      videoLabel: "激活图鉴交互演示",
+      videos: [
+        {
+          src: "assets/boyu-activation.mp4",
+          label: "激活图鉴交互演示",
+        },
+        {
+          src: "assets/boyu-gallery-motion.mp4",
+          label: "画册动效演示",
+        },
+      ],
+      shots: [
+        {
+          src: "assets/boyu-ui-gallery-carousel.jpg?v=1",
+          alt: "藏品图鉴主题卡片横向浏览界面",
+        },
+        {
+          src: "assets/boyu-ui-gallery-detail.png?v=1",
+          alt: "辋川烟雨图鉴藏品收集界面",
+        },
+      ],
     },
     closing: {
       eyebrow: "元境博域 · 藏品图鉴",
@@ -972,7 +990,7 @@ function renderCoverPage(data) {
       <article class="detail-feature-card${feature.accent ? ` accent-${feature.accent}` : ""}">
         <div class="detail-feature-icon">${featureIcon(feature.icon)}</div>
         <h3>${feature.title}</h3>
-        <p>${feature.body}</p>
+        ${feature.body ? `<p>${feature.body}</p>` : ""}
       </article>`
     )
     .join("");
@@ -1687,6 +1705,7 @@ function renderBoyuMetaphorPage(data) {
   const figure = data.image
     ? `<figure class="boyu-metaphor-figure">
         <img src="${data.image}" alt="${data.imageAlt || ""}" />
+        ${data.caption ? `<figcaption>${data.caption}</figcaption>` : ""}
       </figure>`
     : "";
 
@@ -1709,27 +1728,52 @@ function renderBoyuTextPage(data) {
         <img src="${data.image}" alt="${data.imageAlt || ""}" />
       </figure>`
     : "";
-  const video = data.video
-    ? `<div class="boyu-video-wrap">
-        <video
-          src="${data.video}"
-          aria-label="${data.videoLabel || ""}"
-          autoplay
-          muted
-          loop
-          playsinline
-          controls
-        ></video>
+  const videoItems =
+    data.videos ||
+    (data.video
+      ? [{ src: data.video, label: data.videoLabel || "" }]
+      : []);
+  const video = videoItems.length
+    ? `<div class="boyu-video-grid${videoItems.length > 1 ? " is-split" : ""}">
+        ${videoItems
+          .map(
+            (item) => `
+          <div class="boyu-video-wrap">
+            <video
+              src="${item.src}"
+              aria-label="${item.label || ""}"
+              autoplay
+              muted
+              loop
+              playsinline
+              controls
+            ></video>
+          </div>`
+          )
+          .join("")}
+      </div>`
+    : "";
+  const shots = (data.shots || []).length
+    ? `<div class="boyu-shot-grid">
+        ${data.shots
+          .map(
+            (shot) => `
+          <figure class="boyu-shot-figure">
+            <img src="${shot.src}" alt="${shot.alt || ""}" />
+          </figure>`
+          )
+          .join("")}
       </div>`
     : "";
   return `
-    <section class="boyu-page boyu-implementation-page${data.video || data.image ? "" : " detail-text-surface"}">
+    <section class="boyu-page boyu-implementation-page${videoItems.length || data.image || (data.shots || []).length ? "" : " detail-text-surface"}">
       <header class="detail-thinking-header">
         <p class="detail-eyebrow">${data.eyebrow}</p>
         <h2 class="detail-thinking-title">${data.title}</h2>
       </header>
       <p class="boyu-text-body">${data.body}</p>
       ${video}
+      ${shots}
       ${figure}
     </section>`;
 }
@@ -2154,7 +2198,8 @@ function startOverlaySurfaceWatch() {
     const isText = best.classList.contains("detail-text-surface");
     const isIntro =
       best.classList.contains("manju-cover-page") ||
-      best.classList.contains("boyu-intro-page");
+      best.classList.contains("boyu-intro-page") ||
+      best.classList.contains("jellytoken-cover-page");
     setOverlayMediaView(!isText);
     setOverlayIntroChrome(isIntro);
   };
@@ -2176,7 +2221,7 @@ function startOverlaySurfaceWatch() {
       applySurface(best);
     },
     {
-      root: panel,
+      root: overlayBody,
       threshold: [0, 0.15, 0.35, 0.55, 0.75, 1],
     }
   );
@@ -2198,6 +2243,7 @@ function resetDetailScroll() {
     firstPage.scrollIntoView({ block: "start", behavior: "auto" });
   }
   if (panel) panel.scrollTop = 0;
+  if (overlayBody) overlayBody.scrollTop = 0;
 }
 
 function openProject(id) {
@@ -2276,11 +2322,18 @@ let lightboxLastFocus = null;
 function openImageLightbox(src, alt = "") {
   if (!lightbox || !lightboxImg || !src) return;
   lightboxLastFocus = document.activeElement;
+  lightboxImg.onload = null;
+  lightboxImg.removeAttribute("width");
+  lightboxImg.removeAttribute("height");
+  lightboxImg.style.width = "";
+  lightboxImg.style.height = "";
   lightboxImg.src = src;
   lightboxImg.alt = alt || "原图预览";
   lightbox.hidden = false;
   lightbox.setAttribute("aria-hidden", "false");
   document.body.classList.add("lightbox-open");
+  lightbox.scrollTop = 0;
+  lightbox.scrollLeft = 0;
   requestAnimationFrame(() => lightbox.classList.add("is-open"));
   lightboxClose?.focus();
 }
@@ -2291,7 +2344,12 @@ function closeImageLightbox() {
       lightbox.hidden = true;
       lightbox.setAttribute("aria-hidden", "true");
       lightbox.classList.remove("is-open");
-      if (lightboxImg) lightboxImg.removeAttribute("src");
+      if (lightboxImg) {
+        lightboxImg.onload = null;
+        lightboxImg.removeAttribute("src");
+        lightboxImg.style.width = "";
+        lightboxImg.style.height = "";
+      }
     }
     document.body.classList.remove("lightbox-open");
     return;
@@ -2302,8 +2360,11 @@ function closeImageLightbox() {
   const finish = () => {
     lightbox.hidden = true;
     if (lightboxImg) {
+      lightboxImg.onload = null;
       lightboxImg.removeAttribute("src");
       lightboxImg.alt = "";
+      lightboxImg.style.width = "";
+      lightboxImg.style.height = "";
     }
     if (lightboxLastFocus && typeof lightboxLastFocus.focus === "function") {
       lightboxLastFocus.focus();

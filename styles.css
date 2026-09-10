@@ -1164,9 +1164,9 @@ a {
 
 .project-overlay-panel:has(.detail-text-surface).is-intro-chrome {
   background:
-    radial-gradient(ellipse 88% 68% at 14% 18%, rgba(92, 48, 148, 0.42), transparent 58%),
-    radial-gradient(ellipse 72% 58% at 88% 82%, rgba(52, 28, 88, 0.34), transparent 52%),
-    linear-gradient(165deg, #1c1228 0%, #120e18 42%, #0a0a0c 100%);
+    radial-gradient(ellipse 95% 85% at 14% 12%, rgba(92, 48, 148, 0.46), transparent 62%),
+    radial-gradient(ellipse 80% 70% at 88% 78%, rgba(52, 28, 88, 0.36), transparent 56%),
+    linear-gradient(165deg, #1c1228 0%, #120e18 48%, #0a0a0c 100%);
 }
 
 /* Must beat the intro chrome gradient when viewing illustrated pages */
@@ -1345,8 +1345,11 @@ a {
 }
 
 .project-overlay-panel:has(.detail-text-surface) .manju-cover-page + .detail-page-divider,
-.project-overlay-panel:has(.detail-text-surface) .jellytoken-cover-page + .detail-page-divider {
+.project-overlay-panel:has(.detail-text-surface) .jellytoken-cover-page + .detail-page-divider,
+.project-overlay-panel:has(.manju-cover-page):has(.manju-hallucination-page):not(.is-media-view) .manju-cover-page + .detail-page-divider,
+.project-overlay-panel:has(.manju-cover-page):has(.manju-fallback-page):not(.is-media-view) .manju-cover-page + .detail-page-divider {
   background: transparent;
+  box-shadow: none;
 }
 
 .detail-cover-right {
@@ -1452,6 +1455,13 @@ a {
 .project-overlay-panel:has(.jellytoken-cover-page) .detail-page-divider {
   background: #000;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* 漫剧文案页之间的分隔条跟页面灰底一致，避免出现纯黑条 */
+.project-overlay-panel:has(.manju-cover-page):has(.manju-fallback-page):not(.is-media-view) .detail-page-divider,
+.project-overlay-panel:has(.manju-cover-page):has(.manju-hallucination-page):not(.is-media-view) .detail-page-divider {
+  background: #1a1a1c;
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
 }
 
 .project-overlay-panel:has(.detail-text-surface) .detail-page-divider.manju-bleed-divider {
@@ -2376,6 +2386,205 @@ body.lightbox-open {
   font-size: 0.95rem;
   line-height: 1.85;
   color: rgba(255, 255, 255, 0.82);
+}
+
+.manju-fallback-page .detail-thinking-header {
+  margin-bottom: 1.15rem;
+}
+
+.manju-hallucination-page .detail-thinking-header {
+  margin-bottom: 1.15rem;
+}
+
+.manju-hallucination-page .manju-fallback-panel {
+  gap: 0.95rem;
+}
+
+.manju-hallucination-lead {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.manju-hallucination-blocks {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.manju-hallucination-blocks.is-plain {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.manju-hallucination-pains,
+.manju-hallucination-solutions {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.manju-hallucination-pains ol {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.9rem;
+  line-height: 1.8;
+}
+
+.manju-hallucination-pains li + li {
+  margin-top: 0.45rem;
+}
+
+.manju-hallucination-cards {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.manju-hallucination-card.is-nested {
+  padding: 0.95rem 1rem 1.05rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.035);
+  display: grid;
+  gap: 0.5rem;
+}
+
+.manju-hallucination-card h4 {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.4;
+}
+
+.manju-hallucination-card p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.manju-hallucination-card strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.manju-hallucination-note {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.68) !important;
+  font-size: 0.84rem !important;
+  line-height: 1.7 !important;
+}
+
+.detail-text-surface .manju-hallucination-lead,
+.detail-text-surface .manju-hallucination-pains ol,
+.detail-text-surface .manju-hallucination-card p {
+  color: var(--detail-text-body);
+}
+
+.detail-text-surface .manju-hallucination-note {
+  color: var(--detail-text-muted) !important;
+}
+
+.manju-fallback-panels {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 860px) {
+  .manju-fallback-panels {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.15rem 1.35rem;
+    align-items: stretch;
+  }
+
+  .manju-fallback-panels:has(> :only-child) {
+    grid-template-columns: minmax(0, 36rem);
+  }
+}
+
+.manju-fallback-panel {
+  display: grid;
+  align-content: start;
+  gap: 0.85rem;
+  min-height: 100%;
+}
+
+.manju-fallback-panel h3 {
+  margin: 0;
+}
+
+.manju-fallback-panel > p {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.manju-fallback-figure {
+  margin: 0.15rem 0 0;
+  overflow: hidden;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #0b0b0d;
+}
+
+.manju-fallback-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.manju-fallback-block {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.manju-fallback-block + .manju-fallback-block {
+  margin-top: 0.15rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.manju-fallback-label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  color: #7eb6ff;
+}
+
+.manju-fallback-block p:not(.manju-fallback-label) {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.manju-fallback-block p + p {
+  margin-top: 0.55rem;
+}
+
+.manju-fallback-block strong {
+  color: #fff;
+  font-weight: 600;
+}
+
+.detail-text-surface .manju-fallback-panel > p,
+.detail-text-surface .manju-fallback-block p:not(.manju-fallback-label) {
+  color: var(--detail-text-body);
+}
+
+.detail-text-surface .manju-fallback-label {
+  color: #7eb6ff;
+}
+
+.detail-text-surface .manju-fallback-block strong {
+  color: var(--detail-text-title);
 }
 
 .manju-upgrade-page .manju-lead {

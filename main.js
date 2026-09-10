@@ -216,18 +216,80 @@ const projects = {
     layout: "manju",
     cover: {
       title: "漫剧生成平台",
-      role: "产品全站视觉设计、核心链路交互优化",
+      role: "AI内嵌式增强产品交互设计和网站视觉升级",
       pageClass: "manju-cover-page",
       background:
-        "面向内容创作者，提供真人影视剧、实拍视频的 AI 漫剧转绘能力。支持将中文真人视频，一键完成人物风格改写、语种翻译、台词与字幕置换，输出海外适配的漫剧成片；同时内置无限画布创作模块，支持可视化编排漫剧镜头与故事分镜。",
+        "面向内容创作者，提供真人影视剧、实拍视频的 AI 漫剧转绘能力。支持将中文真人视频，一键完成人物风格改写、语种翻译、台词与字幕置换，输出海外适配的漫剧成片；同时内置无限画布创作模块，支持可视化编排生成AI视频。",
     },
     pages: [
+      {
+        type: "hallucination",
+        eyebrow: "交互处理 AI 幻觉、会话异常兜底的设计方案",
+        title: "关于AI幻觉的交互设计",
+        panels: [
+          {
+            title: "无限画布",
+            blocks: [
+              {
+                label: "当前版本",
+                body: "用户在节点填写需求、上传参考图，提交后节点进入加载状态，生成结果直接展示在当前节点内部，不会自动新建节点；生成失败会给出明确提示。",
+              },
+              {
+                label: "问题",
+                body: "没有节点内上下文记忆、节点版本回溯能力。",
+              },
+            ],
+            ideas: [
+              {
+                title: "节点上下文独立",
+                body: "<strong>每个节点默认独立，不自动继承上游所有历史上下文。</strong>节点默认只基于当前输入、参考素材和当前版本参数生成结果，避免人物跑偏、剧情串连和画风污染。",
+              },
+              {
+                title: "视频节点版本回溯",
+                body: "视频生成成本高、复现难度大，因此视频节点支持完整版本回溯，保留所有生成视频，并支持用户回溯、对比和下载。",
+              },
+            ],
+          },
+          {
+            title: "转绘流水线",
+            blocks: [
+              {
+                label: "问题",
+                body: "这个模块是顺序流转的工作流，幻觉风险是上下游资产、人物设定在链路传递过程中跑偏，比如前面设定好的角色，到视频生成阶段形象变形。",
+              },
+              {
+                label: "我的设计方案",
+                body: "在资产管理环节锁定角色参考图与人物设定，基准素材自动贯穿整条流水线，每一步 AI 生成都强制带入这套参考，固定角色风格；在切片、关键帧环节设置人工确认卡点，用户不审核确认，不能进入下一步，把 AI 错误拦截在当前环节。",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        type: "fallback",
+        eyebrow: "交互处理 AI 幻觉、会话异常兜底的设计方案",
+        title: "会话/流程异常兜底",
+        panels: [
+          {
+            title: "自由画布",
+            body: "节点互相解耦，单个节点失败不影响整张画布；失败节点保留提示词与参考图，画布实时自动保存。",
+            image: "assets/manju-canvas-fallback.png?v=1",
+            imageAlt: "无限画布节点解耦与失败兜底界面示意",
+          },
+          {
+            title: "转绘流水线",
+            body: "每一步成果独立持久保存，支持断点续跑，某一步生成失败，前面的剧本、资产、切片全部保留，不用从头跑完整流程；增加每一步的步骤锁，上一步未确认，无法进入下一环节，避免缺失素材进入 AI。",
+            image: "assets/manju-pipeline-fallback.png?v=1",
+            imageAlt: "转绘流水线步骤锁与断点续跑界面示意",
+          },
+        ],
+      },
       {
         type: "upgrade",
         eyebrow: "AI漫剧生成平台",
         title: "视觉升级：从问题诊断到竞品约束",
         problems: {
-          title: "旧版（白-橙色）现存问题",
+          title: "旧版现存问题",
           bullets: [
             "浅色背景下，视频、画布画面被白色底色抢夺视觉权重，创作者难以专注审视画面内容；",
             "橙色偏向工具、活力感，缺少漫剧创作所需要的沉浸、故事、艺术氛围感；",
@@ -1271,6 +1333,120 @@ function renderManjuPage(page) {
   }
 
   const header = renderManjuHeader(page);
+  if (page.type === "hallucination") {
+    const panels = (page.panels || [])
+      .map((panel) => {
+        const blocks = (panel.blocks || [])
+          .map((block) => {
+            const paras = (block.paragraphs || [block.body].filter(Boolean))
+              .map((text) => `<p>${text}</p>`)
+              .join("");
+            return `
+              <div class="manju-fallback-block">
+                <p class="manju-fallback-label">${block.label}</p>
+                ${paras}
+              </div>`;
+          })
+          .join("");
+        const lead = panel.lead
+          ? `<p class="manju-hallucination-lead">${panel.lead}</p>`
+          : "";
+        const pains = panel.pains
+          ? `
+            <div class="manju-hallucination-pains">
+              <p class="manju-fallback-label">${panel.pains.title}</p>
+              <ol>
+                ${(panel.pains.items || []).map((item) => `<li>${item}</li>`).join("")}
+              </ol>
+            </div>`
+          : "";
+        const ideas = (panel.ideas || []).length
+          ? `
+            <div class="manju-hallucination-cards">
+              ${panel.ideas
+                .map(
+                  (item) => `
+                <article class="manju-hallucination-card is-nested">
+                  <h4>${item.title}</h4>
+                  <p>${item.body}</p>
+                </article>`
+                )
+                .join("")}
+            </div>`
+          : "";
+        const solutions = (panel.solutions || []).length
+          ? `
+            <div class="manju-hallucination-solutions">
+              <p class="manju-fallback-label">设计方案</p>
+              <div class="manju-hallucination-cards">
+                ${panel.solutions
+                  .map(
+                    (item) => `
+                  <article class="manju-hallucination-card is-nested">
+                    <h4>${item.title}</h4>
+                    <p>${item.body}</p>
+                    ${item.note ? `<p class="manju-hallucination-note">${item.note}</p>` : ""}
+                  </article>`
+                  )
+                  .join("")}
+              </div>
+            </div>`
+          : "";
+        return `
+        <article class="manju-panel manju-fallback-panel">
+          <h3>${panel.title}</h3>
+          ${lead}
+          ${blocks ? `<div class="manju-hallucination-blocks is-plain">${blocks}</div>` : ""}
+          ${ideas}
+          ${pains}
+          ${solutions}
+        </article>`;
+      })
+      .join("");
+
+    return `
+      <section class="manju-page manju-hallucination-page manju-fallback-page detail-text-surface">
+        ${header}
+        <div class="manju-fallback-panels">${panels}</div>
+      </section>`;
+  }
+
+  if (page.type === "fallback") {
+    const panels = (page.panels || [])
+      .map((panel) => {
+        const body = (panel.blocks || []).length
+          ? panel.blocks
+              .map(
+                (block) => `
+              <div class="manju-fallback-block">
+                <p class="manju-fallback-label">${block.label}</p>
+                <p>${block.body}</p>
+              </div>`
+              )
+              .join("")
+          : panel.body
+            ? `<p>${panel.body}</p>`
+            : "";
+        const image = panel.image
+          ? `<figure class="manju-fallback-figure">
+              <img src="${panel.image}" alt="${panel.imageAlt || ""}" />
+            </figure>`
+          : "";
+        return `
+        <article class="manju-panel manju-fallback-panel">
+          <h3>${panel.title}</h3>
+          ${body}
+          ${image}
+        </article>`;
+      })
+      .join("");
+    return `
+      <section class="manju-page manju-fallback-page detail-text-surface">
+        ${header}
+        <div class="manju-fallback-panels">${panels}</div>
+      </section>`;
+  }
+
   if (page.type === "upgrade") {
     const problemsBullets = (page.problems?.bullets || [])
       .map((item) => `<li>${item}</li>`)
